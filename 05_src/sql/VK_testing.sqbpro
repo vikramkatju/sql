@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="VK_testing.db" readonly="0" foreign_keys="0" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="7306"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="booth" custom_title="0" dock_id="1" table="4,5:mainbooth"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000010100ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">--SELECT 
+
+--selecting everything from customer
+SELECT *
+FROM customer;
+
+--adding some static values
+SELECT 2024 as this_year, 'December' as this_month
+FROM customer;
+
+--math
+SELECT 10 * 5;
+
+--add an order by
+SELECT *
+FROM customer 
+ORDER by 
+
+--WHERE
+SELECT *
+FROM customer
+WHERE customer_id = 1 or 2
+
+SELECT *
+FROM customer
+WHERE customer_id = 1 and 2
+
+--IN
+SELECT *
+FROM customer_purchases
+WHERE customer_id IN (3,4,5)
+AND vendor_id IN (3,4,5)
+
+SELECT *
+FROM product
+WHERE product_name LIKE '%pepper%'  --note by default sql is not case sensitive
+
+SELECT * FROM product
+WHERE product_id IN (1,2)
+OR product_size = 'medium'
+
+SELECT * from customer
+WHERE customer_last_name LIKE '%a%a%'
+
+SELECT * from product
+WHERE product_size IS NULL
+OR product_size = &quot;--blank, different from a single space = &quot;
+
+--CASE
+
+--'day of speciality for certain criteria'
+SELECT * 
+,CASE WHEN vendor_type = 'Fresh Focussed'
+     THEN 'Wednesday'
+ WHEN vendor_type = 'Prepared Foods'
+    THEN 'Thursday'
+	ELSE 'Saturday'
+	END as day_of_speciality
+	, CASE WHEN vendor_name LIKE '%pie%'
+	   THEN 'Wednesday'
+	   END as only_pie_day
+	 -- , CASE WHEN vendor_name = 'Annie's Pies' --cannot do this yet so we need like instead! 
+	   
+	FROM vendor
+
+
+
+--DISTINCT
+--without distinct, only wed/sat 150x
+SELECT market_day
+FROM market_date_info
+
+
+--with DISTINCT
+SELECT DISTINCT market_day
+FROM market_date_info
+
+SELECT * FROM customer_purchases;
+
+
+/*Which vendor has sold products to a customer*/
+SELECT DISTINCT vendor_id
+FROM customer_purchases
+
+/*Which vendor has sold products to a customer and which product was it*/
+
+SELECT DISTINCT vendor_id, product_id
+FROM customer_purchases
+
+/*Which vendor has sold products to a customer and which product was it and which customer bought it*/
+SELECT DISTINCT vendor_id, product_id, customer_id
+FROM customer_purchases
+ORDER by product_id ASC, customer_id DESC
+
+--INNER JOIN
+
+SELECT customer_purchases.product_id, product.product.id, product_name, 
+vendor_id, market_date, customer_id
+FROM customer_purchases
+INNER JOIN product
+  ON customer_purchases.product_id = product.product_id;
+  
+  /*which vendor has sold products to a customer AND which product was it*/
+  SELECT DISTINCT
+  FROM customer_purchases as cp --get the purchases, get the vendor
+  INNER JOIN product as p --get the name of the product
+  ON p.product_id = cp.product_id
+  
+  
+  --count
+  --count the number of products
+  
+  SELECT COUNT (product_id)
+  FROM product
+  
+   SELECT COUNT (product_id) AS num_of_prod
+  FROM product
+  
+  --how many products per product_qty_type
+  SELECT product_qty_type, count(product_id)
+  FROM product
+  WHERE product_qty_type IS NOT NULL --remove null rows
+  GROUP BY product_qty_type;
+  
+  SELECT product_size, product_qty_type, count(product_id)
+  FROM product
+  GROUP BY product_size, product_qty_type;
+  
+  SELECT count(product_id)
+  FROM customer_purchases
+  
+  --how many unique products were purchased
+    SELECT count(DISTINCT product_id)
+  FROM customer_purchases
+  
+  --SUM &amp; avg
+  
+  --how much did a customer spend on each day
+  
+  SELECT 
+  market_date,
+  customer_id,
+  SUM(quantity * cost_to_customer_per_qty) as total_cost
+  
+  FROM customer_purchases
+  GROUP BY market_date, customer_id
+  
+    --how much did a customer spend on average each day
+	SELECT 
+  market_date,
+  customer_id,
+  SUM(quantity * cost_to_customer_per_qty) as total_cost
+  
+  FROM customer_purchases
+  GROUP BY market_date, customer_id
+  
+   --how much did a customer spend on average each day
+	SELECT 
+ customer_first_name,
+ customer_last_name
+  AVG(quantity * cost_to_customer_per_qty) as total_cost
+  
+  FROM customer_purchases
+  GROUP BY market_date, customer_id
+  
+  SELECT product_name, product_qty_type,
+  min(original_price)
+  FROM product p
+  
+--  pi()
+  --sin(10)
+  
+  --how many products were bought
+  SELECT count(product_id), product_id
+  FROM customer_purchases
+  WHERE product_id &lt;= 8
+  GROUP BY product_id
+  HAVING count(product_id) BETWEEN 300 AND 500
+  
+  --top
+    SELECT count(product_id), product_id
+  FROM customer_purchases
+  GROUP BY product_id
+ORDER BY count(product_id) DESC
+LIMIT 3
+
+
+DROP TABLE IF EXISTS  new_vendor_inventory;
+CREATE TEMP TABLE new_vendor_inventory AS
+SELECT *
+original_price * 5 as inflation
+FROM vendor_inventory;</sql><current_tab id="0"/></tab_sql></sqlb_project>
