@@ -54,7 +54,13 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 **HINT:** search type 1 vs type 2 slowly changing dimensions. 
 
 ```
-Your answer...
+In the logical model we have proposed there is no difference between the customer_address table and the customer table since the customer table captures 
+the contact details of the customer including their address. However, there are two possible architectures that this customer table may exhibit. In a Type
+1 slowly changing dimension (SCD), the address field will be such that it can be overwritten. That is, only the current customer address will be stored 
+in the RDBMS (relational database management system). 
+Contrariwise, in a Type 2 SCD, the address field cannot be overwritten. Every time a customer's address changes a new record will be created so that the
+current customer address as well as all previous addresses of the customer are stored in the RDBMS.
+
 ```
 
 ***
